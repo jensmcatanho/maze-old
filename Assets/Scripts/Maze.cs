@@ -1,21 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Maze {
+public class Maze : ScriptableObject {
+	enum Direction {LEFT, UP, RIGHT, DOWN};
+
 	public int length; // x
 	public int width; // z
 
+	public GameObject chest;
 	private GameObject floor;
 
 	private int[,,] maze;
 
-	public Maze (int l, int w) {
+	public void Init (int l, int w) {
 		length = l;
 		width = w;
-	}
-
-	void Start () {
-		Setup();
 	}
 
 	public void Setup() {
@@ -29,20 +28,62 @@ public class Maze {
 
 		for (int i = 0; i < length; i++) {
 			for (int j = 0; j < width; j++) {
-				if (maze [i, j, 0] == 0) 
-					CreateWall (new Vector3(2 * i + 1, 2.0f, 2 * j), new Vector3(90.0f, 0.0f, 0.0f));
+				int numWalls = 0;
 
-				if (maze [i, j, 1] == 0)
+				if (maze [i, j, (int)Direction.LEFT] == 0) {
+					CreateWall (new Vector3 (2 * i + 1, 2.0f, 2 * j), new Vector3 (90.0f, 0.0f, 0.0f));
+					numWalls++;
+				}
+
+				if (maze [i, j, (int)Direction.UP] == 0) {
 					CreateWall (new Vector3(2 * i, 2.0f, 2 * j + 1), new Vector3(90.0f, 90.0f, 0.0f));
+					numWalls++;
+				}
 
-				if (maze [i, j, 2] == 0)
+				if (maze [i, j, (int)Direction.RIGHT] == 0) {
 					CreateWall (new Vector3(2 * i + 1, 2.0f, 2 * j + 2), new Vector3(90.0f, 0.0f, 180.0f));
+					numWalls++;
+				}
 
-				if (maze [i, j, 3] == 0)
+				if (maze [i, j, (int)Direction.DOWN] == 0) {
 					CreateWall (new Vector3(2 * i + 2, 2.0f, 2 * j + 1), new Vector3(90.0f, -90.0f, 0.0f));
+					numWalls++;
+				}
+
+				if (numWalls == 3 && Random.Range (0, 2) > 0) {
+					Debug.Log ("Chest");
+					Vector3 chestLocation = new Vector3(2 * i + 1, 0.0f, 2 * j + 1);
+					Direction dir = Direction.DOWN;
+
+					// Check which direction the chest is facing (which direction of the cell is open).
+					for (int k = 0; k < 4; k++)
+						if (maze[i, j, k] == 1) {
+							dir = (Direction)k;
+							break;
+						}
+
+					switch (dir) {
+						case Direction.LEFT:
+							CreateChest (chestLocation, new Vector3 (0.0f, 180.0f, 0.0f));
+							break;
+
+						case Direction.UP:
+							CreateChest (chestLocation, new Vector3 (0.0f, -90.0f, 0.0f));
+							break;
+
+						case Direction.RIGHT:
+							CreateChest (chestLocation, new Vector3 (0.0f, 0.0f, 0.0f));
+							break;
+
+						case Direction.DOWN:
+							CreateChest (chestLocation, new Vector3 (0.0f, 90.0f, 0.0f));
+							break;
+
+					}
+				
+				}
 			}
 		}
-
 	}
 
 	void CreateWall(Vector3 position, Vector3 rotation) {
@@ -58,6 +99,16 @@ public class Maze {
 		floor.transform.localScale = new Vector3 (length / 5, 1, width / 5);
 		floor.transform.position = new Vector3 (length, 0, width);
 
+	}
+
+	void CreateChest(Vector3 position, Vector3 rotation) {
+		GameObject go = GameObject.Find ("GameManager");
+		GameManager gm = go.GetComponent (typeof(GameManager)) as GameManager;
+
+		Quaternion r = Quaternion.identity;
+		r.eulerAngles = rotation;
+
+		Instantiate (gm.chest, position, r);
 	}
 
 	void DFSMaze() {
@@ -102,27 +153,27 @@ public class Maze {
 				// Mark the walls between cells as open if we move.
 				switch (direction) {
 				case 'L':
-					maze [row, col, 0] = 1;
+					maze [row, col, (int)Direction.LEFT] = 1;
 					col--;
-					maze [row, col, 2] = 1;
+					maze [row, col, (int)Direction.RIGHT] = 1;
 					break;
 
 				case 'U':
-					maze [row, col, 1] = 1;
+					maze [row, col, (int)Direction.UP] = 1;
 					row--;
-					maze [row, col, 3] = 1;
+					maze [row, col, (int)Direction.DOWN] = 1;
 					break;
 
 				case 'R':
-					maze [row, col, 2] = 1;
+					maze [row, col, (int)Direction.RIGHT] = 1;
 					col = col + 1;
-					maze [row, col, 0] = 1;
+					maze [row, col, (int)Direction.LEFT] = 1;
 					break;
 
 				case 'D':
-					maze [row, col, 3] = 1;
+					maze [row, col, (int)Direction.DOWN] = 1;
 					row++;
-					maze [row, col, 1] = 1;
+					maze [row, col, (int)Direction.UP] = 1;
 					break;
 
 				}
@@ -141,5 +192,9 @@ public class Maze {
 			maze [length - 1, width - 1, 2] = 1; 
 
 		}
+	}
+
+	void CreateLoot() {
+	
 	}
 }

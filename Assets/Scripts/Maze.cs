@@ -2,8 +2,8 @@
 using System.Collections;
 
 public class Maze {
-	public int length = 10; // x
-	public int width = 10; // z
+	public int length; // x
+	public int width; // z
 
 	private GameObject floor;
 
@@ -16,10 +16,6 @@ public class Maze {
 
 	void Start () {
 		Setup();
-	}
-	
-	void Update () {
-	
 	}
 
 	public void Setup() {

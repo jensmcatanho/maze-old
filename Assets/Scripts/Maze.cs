@@ -18,7 +18,8 @@ public class Maze : ScriptableObject {
 	}
 
 	public void Setup() {
-		DFSMaze ();
+		//DFSMaze ();
+		PrimMaze ();
 
 		CreateMaze ();
 	}
@@ -51,7 +52,6 @@ public class Maze : ScriptableObject {
 				}
 
 				if (numWalls == 3 && Random.Range (0, 2) > 0) {
-					Debug.Log ("Chest");
 					Vector3 chestLocation = new Vector3(2 * i + 1, 0.0f, 2 * j + 1);
 					Direction dir = Direction.DOWN;
 
@@ -79,8 +79,7 @@ public class Maze : ScriptableObject {
 							CreateChest (chestLocation, new Vector3 (0.0f, 90.0f, 0.0f));
 							break;
 
-					}
-				
+					}		
 				}
 			}
 		}
@@ -194,7 +193,118 @@ public class Maze : ScriptableObject {
 		}
 	}
 
-	void CreateLoot() {
-	
+	void PrimMaze() {
+		ArrayList frontier = new ArrayList (),
+		check = new ArrayList ();
+
+		// The array maze is going to hold the information for each cell.
+		// The first four coordinates tell if walls exist on those sides and the fifth indicates if the cell has benn visited in the search.
+		// maze(left, up, right, down, check_if_visited)
+		maze = new int[length, width, 5];
+
+		// Select a random cell from the maze.
+		int row = Random.Range (0, length);
+		int col = Random.Range(0, width);
+
+		// Set this cell as visited.
+		maze[row, col, 4] = 1;
+
+		// Add the adjacent cells that are not part of the maze (and within the grid size) to the frontier list.
+		if (col > 0 && maze [row, col - 1, 4] == 0)
+			frontier.Add (new Vector2 (row, col - 1));
+
+		if (row > 0 && maze [row - 1, col, 4] == 0)
+			frontier.Add (new Vector2 (row - 1, col));
+
+		if (col < length - 1 && maze [row, col + 1, 4] == 0)
+			frontier.Add (new Vector2 (row, col + 1));
+
+		if (row < width - 1 && maze [row + 1, col, 4] == 0)
+			frontier.Add (new Vector2 (row + 1, col));
+
+		Debug.Log (row + " " + col);
+		Debug.Log (frontier.Count);
+
+		do {
+			int index = Random.Range (0, frontier.Count);
+			Vector2 nextCell = (Vector2)frontier [index];
+			row = (int)nextCell.x;
+			col = (int)nextCell.y;
+			frontier.RemoveAt (index);
+
+			int numCells = 0;
+			for (int i = 0; i < length; i++)
+				for (int j = 0; j < width; j++)
+					if (maze[i, j, 4] == 1)
+						numCells++;
+
+			Debug.Log("Cells in the maze: " + numCells);
+
+			// Set this cell as visited.
+			maze[row, col, 4] = 1;
+
+			check.Clear();
+
+			// Add the adjacent cells that are not part of the maze (and within the grid size) to the frontier list.
+			if (col > 0 && maze [row, col - 1, 4] == 0)
+				frontier.Add (new Vector2 (row, col - 1));
+
+			if (row > 0 && maze [row - 1, col, 4] == 0)
+				frontier.Add (new Vector2 (row - 1, col));
+
+			if (col < length - 1 && maze [row, col + 1, 4] == 0)
+				frontier.Add (new Vector2 (row, col + 1));
+
+			if (row < width - 1 && maze [row + 1, col, 4] == 0)
+				frontier.Add (new Vector2 (row + 1, col));
+
+			// Check which adjacent cells of the next cell are already part of the maze.
+			if (col > 0 && maze [row, col - 1, 4] == 1)
+				check.Add('L');
+
+			if (row > 0 && maze [row - 1, col, 4] == 1)
+				check.Add('U');
+
+			if (col < length - 1 && maze [row, col + 1, 4] == 1)
+				check.Add('R');
+
+			if (row < width - 1 && maze [row + 1, col, 4] == 1)
+				check.Add('D');
+
+			// Choose which cell the nextCell will be conected to.
+			Debug.Log(check.Count);
+			char direction = System.Convert.ToChar(check[Random.Range(0, check.Count)]);
+
+			switch (direction) {
+			case 'L':
+				maze [row, col, (int)Direction.LEFT] = 1;
+				col--;
+				maze [row, col, (int)Direction.RIGHT] = 1;
+				break;
+
+			case 'U':
+				maze [row, col, (int)Direction.UP] = 1;
+				row--;
+				maze [row, col, (int)Direction.DOWN] = 1;
+				break;
+
+			case 'R':
+				maze [row, col, (int)Direction.RIGHT] = 1;
+				col = col + 1;
+				maze [row, col, (int)Direction.LEFT] = 1;
+				break;
+
+			case 'D':
+				maze [row, col, (int)Direction.DOWN] = 1;
+				row++;
+				maze [row, col, (int)Direction.UP] = 1;
+				break;
+
+			}
+
+		} while (frontier.Count > 0);
+
+		maze [0, 0, 0] = 1;
+		maze [length - 1, width - 1, 2] = 1; 
 	}
 }

@@ -18,8 +18,16 @@ public class Maze : ScriptableObject {
 	}
 
 	public void Setup() {
-		//DFSMaze ();
-		PrimMaze ();
+		int type = Random.Range (0, 2);
+
+		switch (type) {
+		case 0:
+			DFSMaze ();
+			break;
+		case 1:
+			PrimMaze ();
+			break;
+		}
 
 		CreateMaze ();
 	}
@@ -153,26 +161,22 @@ public class Maze : ScriptableObject {
 				switch (direction) {
 				case 'L':
 					maze [row, col, (int)Direction.LEFT] = 1;
-					col--;
-					maze [row, col, (int)Direction.RIGHT] = 1;
+					maze [row, --col, (int)Direction.RIGHT] = 1;
 					break;
 
 				case 'U':
 					maze [row, col, (int)Direction.UP] = 1;
-					row--;
-					maze [row, col, (int)Direction.DOWN] = 1;
+					maze [--row, col, (int)Direction.DOWN] = 1;
 					break;
 
 				case 'R':
 					maze [row, col, (int)Direction.RIGHT] = 1;
-					col = col + 1;
-					maze [row, col, (int)Direction.LEFT] = 1;
+					maze [row, ++col, (int)Direction.LEFT] = 1;
 					break;
 
 				case 'D':
 					maze [row, col, (int)Direction.DOWN] = 1;
-					row++;
-					maze [row, col, (int)Direction.UP] = 1;
+					maze [++row, col, (int)Direction.UP] = 1;
 					break;
 
 				}
@@ -194,6 +198,99 @@ public class Maze : ScriptableObject {
 	}
 
 	void PrimMaze() {
+		ArrayList frontier = new ArrayList ();
+		ArrayList neighbors = new ArrayList ();
+
+		maze = new int[length, width, 5];
+
+		// 1. Pick a cell randomly.
+		int row = Random.Range (0, length);
+		int col = Random.Range (0, width);
+
+		// 2. Mark it as visited.
+		maze[row, col, 4] = 1;
+
+		do {
+			// 3. Add its neighbors to the frontier list and mark them as part of the frontier.
+			if (col > 0 && maze [row, col - 1, 4] == 0) {
+				frontier.Add (new Vector2 (row, col - 1)); // Left
+				maze [row, col - 1, 4] = 2;
+			}
+
+			if (row > 0 && maze [row - 1, col, 4] == 0) {
+				frontier.Add (new Vector2 (row - 1, col)); // Up
+				maze [row - 1, col, 4] = 2;
+			}
+
+			if (col < length - 1 && maze [row, col + 1, 4] == 0) {
+				frontier.Add (new Vector2 (row, col + 1)); // Right
+				maze [row, col + 1, 4] = 2;
+			}
+
+			if (row < width - 1 && maze [row + 1, col, 4] == 0) {
+				frontier.Add (new Vector2 (row + 1, col)); // Down
+				maze [row + 1, col, 4] = 2;
+			}
+
+			// 4. Pick a cell in the frontier list randomly.
+			Vector2 nextCell = (Vector2)frontier [Random.Range (0, frontier.Count)];
+			row = (int)nextCell.x; 
+			col = (int)nextCell.y;
+
+			// 5. Mark it as visited and remove it from the frontier list.
+			frontier.Remove (nextCell);
+			maze[row, col, 4] = 1;
+
+			// 6. Check which of its neighbors were already visited.
+			neighbors.Clear();
+
+			if (col > 0 && maze [row, col - 1, 4] == 1)
+				neighbors.Add('L');
+
+			if (row > 0 && maze [row - 1, col, 4] == 1)
+				neighbors.Add('U');
+
+			if (col < length - 1 && maze [row, col + 1, 4] == 1)
+				neighbors.Add('R');
+
+			if (row < width - 1 && maze [row + 1, col, 4] == 1)
+				neighbors.Add('D');
+
+			// 7. Randomly choose a neighbor to connect to the current cell.
+			char direction = System.Convert.ToChar(neighbors[Random.Range(0, neighbors.Count)]);
+
+			switch (direction) {
+			case 'L':
+				maze [row, col, (int)Direction.LEFT] = 1;
+				maze [row, col - 1, (int)Direction.RIGHT] = 1;
+				break;
+
+			case 'U':
+				maze [row, col, (int)Direction.UP] = 1;
+				maze [row - 1, col, (int)Direction.DOWN] = 1;
+				break;
+
+			case 'R':
+				maze [row, col, (int)Direction.RIGHT] = 1;
+				maze [row, col + 1, (int)Direction.LEFT] = 1;
+				break;
+
+			case 'D':
+				maze [row, col, (int)Direction.DOWN] = 1;
+				maze [row + 1, col, (int)Direction.UP] = 1;
+				break;
+
+			}
+
+		// 8. If there are still cells in the frontier list, go back to step 3.
+		} while (frontier.Count > 0);
+			
+		// 9. Open an entrance and a exit to the maze.
+		maze [0, 0, 0] = 1;
+		maze [length - 1, width - 1, 2] = 1; 
+	}
+
+	void PrimsMaze() {
 		ArrayList frontier = new ArrayList (),
 		check = new ArrayList ();
 

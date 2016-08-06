@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.45140755, g: 0.4996864, b: 0.5661474, a: 1}
+  m_IndirectSpecularColor: {r: 0.45140463, g: 0.4996823, b: 0.566143, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -263,8 +263,8 @@ MonoBehaviour:
   player: {fileID: 100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
   finishTrigger: {fileID: 195146, guid: 398dbef9075c08440a8ca6442c471243, type: 2}
   chest: {fileID: 1000012773638022, guid: c2fd2ef0e7aa24c4db9d84b20f9890b6, type: 2}
-  mazeLength: 5
-  mazeWidth: 5
+  mazeLength: 20
+  mazeWidth: 20
 --- !u!4 &1965141194
 Transform:
   m_ObjectHideFlags: 0

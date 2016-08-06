@@ -10,6 +10,9 @@ public class Maze : ScriptableObject {
 	public GameObject chest;
 	private GameObject floor;
 
+	// The array maze is going to hold the information for each cell.
+	// The first four coordinates tell if walls exist on those sides and the fifth indicates if the cell has benn visited in the search.
+	// maze(left, up, right, down, check_if_visited)
 	private int[,,] maze;
 
 	public void Init (int l, int w) {
@@ -119,45 +122,41 @@ public class Maze : ScriptableObject {
 	}
 
 	void DFSMaze() {
-		ArrayList history = new ArrayList (), 
-		check = new ArrayList ();
+		ArrayList history = new ArrayList ();
+		ArrayList neighbors = new ArrayList ();
 
-		int row = 0,
-		col = 0;
+		// 1. Start in the first cell.
+		int row = 0;
+		int col = 0;
 
-		// The array maze is going to hold the information for each cell.
-		// The first four coordinates tell if walls exist on those sides and the fifth indicates if the cell has benn visited in the search.
-		// maze(left, up, right, down, check_if_visited)
 		maze = new int[length, width, 5];
-
+	
+		// 2. Add it to the history stack.
 		history.Add (new Vector2 (row, col));
 
 		while (history.Count > 0) {
-			// Set this cell as visited.
+			// 3. Mark it as visited.
 			maze [row, col, 4] = 1;
 
-			// Clear the check array.
-			check.Clear();
-
-			// Check if the adjacent cells are valid for moving to.
+			// 4. Check which of its neighbors were not yet visited.
+			neighbors.Clear();
 			if (col > 0 && maze [row, col - 1, 4] == 0)
-				check.Add ('L');
+				neighbors.Add ('L');
 
 			if (row > 0 && maze [row - 1, col, 4] == 0)
-				check.Add ('U');
+				neighbors.Add ('U');
 
 			if (col < length - 1 && maze [row, col + 1, 4] == 0)
-				check.Add ('R');
+				neighbors.Add ('R');
 
 			if (row < width - 1 && maze [row + 1, col, 4] == 0)
-				check.Add ('D');
-
-			// If there is a valid cell to move to.
-			if (check.Count > 0) {
+				neighbors.Add ('D');
+			
+			// 5a. If there is a neighbor not yet visited, choose one randomly to connect to the current cell. 
+			if (neighbors.Count > 0) {
 				history.Add (new Vector2 (row, col));
-				char direction = System.Convert.ToChar (check [Random.Range (0, check.Count)]);
+				char direction = System.Convert.ToChar (neighbors [Random.Range (0, neighbors.Count)]);
 
-				// Mark the walls between cells as open if we move.
 				switch (direction) {
 				case 'L':
 					maze [row, col, (int)Direction.LEFT] = 1;
@@ -181,20 +180,21 @@ public class Maze : ScriptableObject {
 
 				}
 
+			// 5b. If there isn't a neighbor to visit, backtrack one step.
 			} else {
-				// Retrace one step back in history if no move is possible.
 				Vector2 retrace = (Vector2)history [history.Count - 1];
 				row = (int)retrace.x;
 				col = (int)retrace.y;
 
 				history.RemoveAt (history.Count - 1);
-
 			}
 
-			maze [0, 0, 0] = 1;
-			maze [length - 1, width - 1, 2] = 1; 
-
+			// 6. If there are still cells in the history list, go back to step 3.
 		}
+
+		// 7. Open an entrance and a exit to the maze.
+		maze [0, 0, 0] = 1;
+		maze [length - 1, width - 1, 2] = 1; 
 	}
 
 	void PrimMaze() {

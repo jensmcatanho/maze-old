@@ -1,18 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Maze : ScriptableObject {
+[System.Serializable]
+public class Maze {
+	public int length;
+	public int width;
+
+	public Vector3 spawnPoint;
+	public Vector3 finishPoint;
 	enum Direction {LEFT, UP, RIGHT, DOWN};
 
-	public int length; // x
-	public int width; // z
-
+	// Changes through the level types.
 	public GameObject chest;
-	private GameObject floor;
+	public GameObject floor;
+	public GameObject wall;
 
-	// The array maze is going to hold the information for each cell.
-	// The first four coordinates tell if walls exist on those sides and the fifth indicates if the cell has benn visited in the search.
-	// maze(left, up, right, down, check_if_visited)
+	public int wallCounter = 0;
+
 	private int[,,] maze;
 
 	public void Init (int l, int w) {
@@ -43,22 +47,22 @@ public class Maze : ScriptableObject {
 				int numWalls = 0;
 
 				if (maze [i, j, (int)Direction.LEFT] == 0) {
-					CreateWall (new Vector3 (2 * i + 1, 2.0f, 2 * j), new Vector3 (90.0f, 0.0f, 0.0f));
+					CreateWall (new Vector3 (2 * i + 1, 2.0f, 2 * j), new Vector3(90.0f, 90.0f, 0.0f));
 					numWalls++;
 				}
 
 				if (maze [i, j, (int)Direction.UP] == 0) {
-					CreateWall (new Vector3(2 * i, 2.0f, 2 * j + 1), new Vector3(90.0f, 90.0f, 0.0f));
+					CreateWall (new Vector3(2 * i, 2.0f, 2 * j + 1), new Vector3(90.0f, 0.0f, 180.0f));
 					numWalls++;
 				}
 
 				if (maze [i, j, (int)Direction.RIGHT] == 0) {
-					CreateWall (new Vector3(2 * i + 1, 2.0f, 2 * j + 2), new Vector3(90.0f, 0.0f, 180.0f));
+					CreateWall (new Vector3(2 * i + 1, 2.0f, 2 * j + 2), new Vector3(90.0f, -90.0f, 0.0f));
 					numWalls++;
 				}
 
 				if (maze [i, j, (int)Direction.DOWN] == 0) {
-					CreateWall (new Vector3(2 * i + 2, 2.0f, 2 * j + 1), new Vector3(90.0f, -90.0f, 0.0f));
+					CreateWall (new Vector3(2 * i + 2, 2.0f, 2 * j + 1), new Vector3(90.0f, 0.0f, 0.0f));
 					numWalls++;
 				}
 
@@ -74,21 +78,21 @@ public class Maze : ScriptableObject {
 						}
 
 					switch (dir) {
-						case Direction.LEFT:
-							CreateChest (chestLocation, new Vector3 (0.0f, 180.0f, 0.0f));
-							break;
+					case Direction.LEFT:
+						CreateChest (chestLocation, new Vector3 (0.0f, 180.0f, 0.0f));
+						break;
 
-						case Direction.UP:
-							CreateChest (chestLocation, new Vector3 (0.0f, -90.0f, 0.0f));
-							break;
+					case Direction.UP:
+						CreateChest (chestLocation, new Vector3 (0.0f, -90.0f, 0.0f));
+						break;
 
-						case Direction.RIGHT:
-							CreateChest (chestLocation, new Vector3 (0.0f, 0.0f, 0.0f));
-							break;
+					case Direction.RIGHT:
+						CreateChest (chestLocation, new Vector3 (0.0f, 0.0f, 0.0f));
+						break;
 
-						case Direction.DOWN:
-							CreateChest (chestLocation, new Vector3 (0.0f, 90.0f, 0.0f));
-							break;
+					case Direction.DOWN:
+						CreateChest (chestLocation, new Vector3 (0.0f, 90.0f, 0.0f));
+						break;
 
 					}		
 				}
@@ -97,11 +101,10 @@ public class Maze : ScriptableObject {
 	}
 
 	void CreateWall(Vector3 position, Vector3 rotation) {
-		GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Plane);
-		wall.transform.localScale = new Vector3 (0.2f, 1.0f, 0.4f);
-		wall.transform.Rotate(rotation);
-		wall.transform.position = position;
+		Quaternion r = Quaternion.identity;
+		r.eulerAngles = rotation;
 
+		MonoBehaviour.Instantiate (wall, position, r);
 	}
 
 	void CreateFloor() {
@@ -112,13 +115,10 @@ public class Maze : ScriptableObject {
 	}
 
 	void CreateChest(Vector3 position, Vector3 rotation) {
-		GameObject go = GameObject.Find ("GameManager");
-		GameManager gm = go.GetComponent (typeof(GameManager)) as GameManager;
-
 		Quaternion r = Quaternion.identity;
 		r.eulerAngles = rotation;
 
-		Instantiate (gm.chest, position, r);
+		MonoBehaviour.Instantiate (chest, position, r);
 	}
 
 	void DFSMaze() {
@@ -130,7 +130,7 @@ public class Maze : ScriptableObject {
 		int col = 0;
 
 		maze = new int[length, width, 5];
-	
+
 		// 2. Add it to the history stack.
 		history.Add (new Vector2 (row, col));
 
@@ -151,7 +151,7 @@ public class Maze : ScriptableObject {
 
 			if (row < width - 1 && maze [row + 1, col, 4] == 0)
 				neighbors.Add ('D');
-			
+
 			// 5a. If there is a neighbor not yet visited, choose one randomly to connect to the current cell. 
 			if (neighbors.Count > 0) {
 				history.Add (new Vector2 (row, col));
@@ -180,7 +180,7 @@ public class Maze : ScriptableObject {
 
 				}
 
-			// 5b. If there isn't a neighbor to visit, backtrack one step.
+				// 5b. If there isn't a neighbor to visit, backtrack one step.
 			} else {
 				Vector2 retrace = (Vector2)history [history.Count - 1];
 				row = (int)retrace.x;
@@ -282,13 +282,36 @@ public class Maze : ScriptableObject {
 
 			}
 
-		// 8. If there are still cells in the frontier list, go back to step 3.
+			// 8. If there are still cells in the frontier list, go back to step 3.
 		} while (frontier.Count > 0);
-			
+
 		// 9. Open an entrance and a exit to the maze.
 		maze [0, 0, 0] = 1;
 		maze [length - 1, width - 1, 2] = 1; 
 	}
+}
+
+/*
+public class Maze : ScriptableObject {
+	enum Direction {LEFT, UP, RIGHT, DOWN};
+
+	public int length; // x
+	public int width; // z
+
+	public GameObject chest;
+	private GameObject floor;
+
+	// The array maze is going to hold the information for each cell.
+	// The first four coordinates tell if walls exist on those sides and the fifth indicates if the cell has benn visited in the search.
+	// maze(left, up, right, down, check_if_visited)
+	private int[,,] maze;
+
+	public void Init (int l, int w) {
+		length = l;
+		width = w;
+	}
+
+
 
 	void PrimsMaze() {
 		ArrayList frontier = new ArrayList (),
@@ -405,3 +428,4 @@ public class Maze : ScriptableObject {
 		maze [length - 1, width - 1, 2] = 1; 
 	}
 }
+*/

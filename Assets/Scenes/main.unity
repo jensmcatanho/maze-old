@@ -259,7 +259,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6d8e64e149f5f142b4c864b4af861e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMaze: {fileID: 0}
+  mainMaze:
+    length: 5
+    width: 5
+    spawnPoint: {x: 0, y: 0, z: 0}
+    finishPoint: {x: 0, y: 0, z: 0}
+    chest: {fileID: 1000012773638022, guid: c2fd2ef0e7aa24c4db9d84b20f9890b6, type: 2}
+    floor: {fileID: 0}
+    wall: {fileID: 1000013782080448, guid: ad5526fd202b1b14ca7c724aa65129fe, type: 2}
+    wallCounter: 0
   player: {fileID: 100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
   finishTrigger: {fileID: 195146, guid: 398dbef9075c08440a8ca6442c471243, type: 2}
   chest: {fileID: 1000012773638022, guid: c2fd2ef0e7aa24c4db9d84b20f9890b6, type: 2}

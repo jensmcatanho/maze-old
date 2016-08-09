@@ -3,33 +3,23 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 	public Maze mainMaze;
+	//public AppState app;
 	public GameObject player;
 	public GameObject finishTrigger;
 	public GameObject chest;
-		
+
 	public int mazeLength;
 	public int mazeWidth;
 
-	Vector3 spawnPoint;
-	Vector3 finishPoint;
-
-	// Use this for initialization
-	void Start () {
-		mainMaze = ScriptableObject.CreateInstance("Maze") as Maze;
+	void Start () {		
 		mainMaze.Init (mazeLength, mazeWidth);
 
-		spawnPoint = new Vector3 (1.0f, 1.0f, 1.0f);
-		finishPoint = new Vector3 (2 * mazeLength - 1, 1.0f, 2 * mazeWidth + 2);
+		mainMaze.spawnPoint = new Vector3 (1.0f, 1.0f, 1.0f);
+		mainMaze.finishPoint = new Vector3 (2 * mazeLength - 1, 1.0f, 2 * mazeWidth + 2);
 
-		Instantiate (player, spawnPoint, new Quaternion());
-		Instantiate (finishTrigger, finishPoint, new Quaternion ());
+		Instantiate (player, mainMaze.spawnPoint, new Quaternion());
+		Instantiate (finishTrigger, mainMaze.finishPoint, new Quaternion ());
 
 		mainMaze.Setup ();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-		
 }

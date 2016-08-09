@@ -260,19 +260,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainMaze:
-    length: 5
-    width: 5
+    length: 0
+    width: 0
     spawnPoint: {x: 0, y: 0, z: 0}
     finishPoint: {x: 0, y: 0, z: 0}
     chest: {fileID: 1000012773638022, guid: c2fd2ef0e7aa24c4db9d84b20f9890b6, type: 2}
     floor: {fileID: 0}
     wall: {fileID: 1000013782080448, guid: ad5526fd202b1b14ca7c724aa65129fe, type: 2}
-    wallCounter: 0
+    pDeadEnd: 0
+    pChest: 0
+    nChests: 0
   player: {fileID: 100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
   finishTrigger: {fileID: 195146, guid: 398dbef9075c08440a8ca6442c471243, type: 2}
   chest: {fileID: 1000012773638022, guid: c2fd2ef0e7aa24c4db9d84b20f9890b6, type: 2}
-  mazeLength: 20
-  mazeWidth: 20
+  mazeLength: 10
+  mazeWidth: 10
 --- !u!4 &1965141194
 Transform:
   m_ObjectHideFlags: 0

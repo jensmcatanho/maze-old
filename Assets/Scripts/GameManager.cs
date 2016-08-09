@@ -3,7 +3,7 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 	public Maze mainMaze;
-	//public AppState app;
+
 	public GameObject player;
 	public GameObject finishTrigger;
 	public GameObject chest;

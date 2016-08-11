@@ -14,8 +14,8 @@ public class GameManager : MonoBehaviour {
 	void Start () {		
 		mainMaze.Init (mazeLength, mazeWidth);
 
-		mainMaze.spawnPoint = new Vector3 (1.0f, 1.0f, 1.0f);
-		mainMaze.finishPoint = new Vector3 (2 * mazeLength - 1, 1.0f, 2 * mazeWidth + 2);
+		mainMaze.spawnPoint = new Vector3 (1.0f * mainMaze.cellSize, 1.0f, 1.0f * mainMaze.cellSize);
+		mainMaze.finishPoint = new Vector3 ((2 * mazeLength - 1) * mainMaze.cellSize, 1.0f, (2 * mazeWidth + 2) * mainMaze.cellSize);
 
 		Instantiate (player, mainMaze.spawnPoint, new Quaternion());
 		Instantiate (finishTrigger, mainMaze.finishPoint, new Quaternion ());

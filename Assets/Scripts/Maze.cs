@@ -34,7 +34,6 @@ public class Maze {
 		switch (type) {
 		case 0:
 			pDeadEnd = 0.1f;
-			ChestSetup ();
 			DFSMaze ();
 			break;
 
@@ -43,76 +42,68 @@ public class Maze {
 			PrimMaze ();
 			break;
 		}
-
+			
+		ChestProbabilitySetup ();
 		CreateMaze ();
 	}
 
 	void CreateMaze() {
 		CreateFloor ();
 
+		// Create walls in the diagonal part of the maze.
 		for (int i = 0; i < length; i++) {
-			for (int j = 0; j < width; j++) {
-				int numWalls = 0;
+			if (maze [i, i, (int)Direction.LEFT] == 0)
+				CreateWall (new Vector3 ((2 * i + 1) * cellSize, 2.0f, 2 * i * cellSize), new Vector3 (90.0f, 90.0f, 0.0f));
 
-				if (maze [i, j, (int)Direction.LEFT] == 0) {
-					CreateWall (new Vector3 ((2 * i + 1) * cellSize, 2.0f, 2 * j * cellSize), new Vector3(90.0f, 90.0f, 0.0f));
-					numWalls++;
-				}
+			if (maze [i, i, (int)Direction.DOWN] == 0)
+				CreateWall (new Vector3 ((2 * i + 2) * cellSize, 2.0f, (2 * i + 1) * cellSize), new Vector3 (90.0f, 0.0f, 0.0f));
 
-				if (maze [i, j, (int)Direction.UP] == 0) {
+			if (maze [i, i, (int)Direction.UP] == 0)
+				CreateWall (new Vector3 (2 * i * cellSize, 2.0f, (2 * i + 1) * cellSize), new Vector3 (90.0f, 0.0f, 180.0f));
+
+			if (maze [i, i, (int)Direction.RIGHT] == 0)
+				CreateWall (new Vector3 ((2 * i + 1) * cellSize, 2.0f, (2 * i + 2) * cellSize), new Vector3 (90.0f, -90.0f, 0.0f));
+		}
+		
+
+		for (int i = 0; i < length; i++) {
+			for (int j = i + 1; j < width; j++) {
+				// Create walls and chests in the lower triangular part of the maze.
+				if (maze [j, i, (int)Direction.LEFT] == 0)
+					CreateWall (new Vector3 ((2 * j + 1) * cellSize, 2.0f, 2 * i * cellSize), new Vector3(90.0f, 90.0f, 0.0f));
+
+				if (maze [j, i, (int)Direction.DOWN] == 0)
+					CreateWall (new Vector3((2 * j + 2) * cellSize, 2.0f, (2 * i + 1) * cellSize), new Vector3(90.0f, 0.0f, 0.0f));
+
+				if (CheckDeadEnd (j, i) && Random.value < pChest)
+					CreateChest (j, i);
+
+				// Create walls in the upper triangular part of the maze.
+				if (maze [i, j, (int)Direction.UP] == 0)
 					CreateWall (new Vector3(2 * i * cellSize, 2.0f, (2 * j + 1) * cellSize), new Vector3(90.0f, 0.0f, 180.0f));
-					numWalls++;
-				}
 
-				if (maze [i, j, (int)Direction.RIGHT] == 0) {
+				if (maze [i, j, (int)Direction.RIGHT] == 0)
 					CreateWall (new Vector3((2 * i + 1) * cellSize, 2.0f, (2 * j + 2) * cellSize), new Vector3(90.0f, -90.0f, 0.0f));
-					numWalls++;
-				}
 
-				if (maze [i, j, (int)Direction.DOWN] == 0) {
-					CreateWall (new Vector3((2 * i + 2) * cellSize, 2.0f, (2 * j + 1) * cellSize), new Vector3(90.0f, 0.0f, 0.0f));
-					numWalls++;
-				}
+				if (CheckDeadEnd (i, j) && Random.value < pChest)
+					CreateChest (i, j);
 
-				if (numWalls == 3)
-					Debug.Log ("Dead end");
-
-				if (numWalls == 3 && Random.value < pChest) {
-					nChests++;
-					Vector3 chestLocation = new Vector3((2 * i + 1) * cellSize, 0.0f, (2 * j + 1) * cellSize);
-					Direction dir = Direction.DOWN;
-
-					// Check which direction the chest is facing (which direction of the cell is open).
-					for (int k = 0; k < 4; k++)
-						if (maze[i, j, k] == 1) {
-							dir = (Direction)k;
-							break;
-						}
-
-					switch (dir) {
-					case Direction.LEFT:
-						CreateChest (chestLocation, new Vector3 (0.0f, 180.0f, 0.0f));
-						break;
-
-					case Direction.UP:
-						CreateChest (chestLocation, new Vector3 (0.0f, -90.0f, 0.0f));
-						break;
-
-					case Direction.RIGHT:
-						CreateChest (chestLocation, new Vector3 (0.0f, 0.0f, 0.0f));
-						break;
-
-					case Direction.DOWN:
-						CreateChest (chestLocation, new Vector3 (0.0f, 90.0f, 0.0f));
-						break;
-
-					}		
-				}
 			}
 		}
+
 	}
 
-	void ChestSetup() {
+	bool CheckDeadEnd(int row, int col) {
+		int numWalls = 0;
+
+		for (int i = 0; i < 4; i++)
+			if (maze [row, col, i] == 0)
+				numWalls++;
+
+		return numWalls == 3 ? true : false;
+	}
+
+	void ChestProbabilitySetup() {
 		/*  Equation 1: nC = (l * w) * dE * pC
 		 *  Equation 2: nC = (l * w) * 0.05
 		 * 
@@ -145,11 +136,41 @@ public class Maze {
 
 	}
 
-	void CreateChest(Vector3 position, Vector3 rotation) {
+	void CreateChest(int row, int col) {
 		Quaternion r = Quaternion.identity;
-		r.eulerAngles = rotation;
+		Vector3 chestPosition = new Vector3 ((2 * row + 1) * cellSize, 0.0f, (2 * col + 1) * cellSize);
+		Vector3 chestRotation = new Vector3();
+		Direction dir = Direction.DOWN;
 
-		MonoBehaviour.Instantiate (chest, position, r);
+		// Check which direction the chest is facing (which direction of the cell is open).
+		for (int k = 0; k < 4; k++)
+			if (maze[row, col, k] == 1) {
+				dir = (Direction)k;
+				break;
+			}
+
+		switch (dir) {
+		case Direction.LEFT:
+			chestRotation = new Vector3 (0.0f, 180.0f, 0.0f);
+			break;
+
+		case Direction.UP:
+			chestRotation = new Vector3 (0.0f, -90.0f, 0.0f);
+			break;
+
+		case Direction.RIGHT:
+			chestRotation = new Vector3 (0.0f, 0.0f, 0.0f);
+			break;
+
+		case Direction.DOWN:
+			chestRotation = new Vector3 (0.0f, 90.0f, 0.0f);
+			break;
+
+		}
+
+		r.eulerAngles = chestRotation;
+		MonoBehaviour.Instantiate (chest, chestPosition, r);
+		nChests++;
 	}
 
 	void DFSMaze() {

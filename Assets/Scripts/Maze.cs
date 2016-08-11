@@ -5,6 +5,7 @@ using System.Collections;
 public class Maze {
 	public int length;
 	public int width;
+	public int cellSize = 1;
 
 	public Vector3 spawnPoint;
 	public Vector3 finishPoint;
@@ -54,22 +55,22 @@ public class Maze {
 				int numWalls = 0;
 
 				if (maze [i, j, (int)Direction.LEFT] == 0) {
-					CreateWall (new Vector3 (2 * i + 1, 2.0f, 2 * j), new Vector3(90.0f, 90.0f, 0.0f));
+					CreateWall (new Vector3 ((2 * i + 1) * cellSize, 2.0f, 2 * j * cellSize), new Vector3(90.0f, 90.0f, 0.0f));
 					numWalls++;
 				}
 
 				if (maze [i, j, (int)Direction.UP] == 0) {
-					CreateWall (new Vector3(2 * i, 2.0f, 2 * j + 1), new Vector3(90.0f, 0.0f, 180.0f));
+					CreateWall (new Vector3(2 * i * cellSize, 2.0f, (2 * j + 1) * cellSize), new Vector3(90.0f, 0.0f, 180.0f));
 					numWalls++;
 				}
 
 				if (maze [i, j, (int)Direction.RIGHT] == 0) {
-					CreateWall (new Vector3(2 * i + 1, 2.0f, 2 * j + 2), new Vector3(90.0f, -90.0f, 0.0f));
+					CreateWall (new Vector3((2 * i + 1) * cellSize, 2.0f, (2 * j + 2) * cellSize), new Vector3(90.0f, -90.0f, 0.0f));
 					numWalls++;
 				}
 
 				if (maze [i, j, (int)Direction.DOWN] == 0) {
-					CreateWall (new Vector3(2 * i + 2, 2.0f, 2 * j + 1), new Vector3(90.0f, 0.0f, 0.0f));
+					CreateWall (new Vector3((2 * i + 2) * cellSize, 2.0f, (2 * j + 1) * cellSize), new Vector3(90.0f, 0.0f, 0.0f));
 					numWalls++;
 				}
 
@@ -78,7 +79,7 @@ public class Maze {
 
 				if (numWalls == 3 && Random.value < pChest) {
 					nChests++;
-					Vector3 chestLocation = new Vector3(2 * i + 1, 0.0f, 2 * j + 1);
+					Vector3 chestLocation = new Vector3((2 * i + 1) * cellSize, 0.0f, (2 * j + 1) * cellSize);
 					Direction dir = Direction.DOWN;
 
 					// Check which direction the chest is facing (which direction of the cell is open).
@@ -125,7 +126,7 @@ public class Maze {
 		 *  pC = probability of chest spawning
 		 * 
 		 */
-		
+
 		pChest = 0.05f / pDeadEnd;
 	}
 
@@ -133,13 +134,14 @@ public class Maze {
 		Quaternion r = Quaternion.identity;
 		r.eulerAngles = rotation;
 
-		MonoBehaviour.Instantiate (wall, position, r);
+		GameObject localWall = MonoBehaviour.Instantiate (wall, position, r) as GameObject;
+		localWall.transform.localScale *= cellSize;
 	}
 
 	void CreateFloor() {
 		GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
-		floor.transform.localScale = new Vector3 (length / 5, 1, width / 5);
-		floor.transform.position = new Vector3 (length, 0, width);
+		floor.transform.localScale = new Vector3 (length / 5 * cellSize, 1, width / 5 * cellSize);
+		floor.transform.position = new Vector3 (length * cellSize, 0, width * cellSize);
 
 	}
 

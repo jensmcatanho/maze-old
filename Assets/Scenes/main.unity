@@ -262,6 +262,7 @@ MonoBehaviour:
   mainMaze:
     length: 0
     width: 0
+    cellSize: 1
     spawnPoint: {x: 0, y: 0, z: 0}
     finishPoint: {x: 0, y: 0, z: 0}
     chest: {fileID: 1000012773638022, guid: c2fd2ef0e7aa24c4db9d84b20f9890b6, type: 2}

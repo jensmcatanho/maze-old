@@ -5,7 +5,7 @@ using System.Collections;
 public class FinishPoint : MonoBehaviour {
 
 	void Start () {
-	
+		
 	}
 
 	void Update () {

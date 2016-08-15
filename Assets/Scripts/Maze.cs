@@ -1,6 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public class NewMaze {
+	private Cell[] m_Cells;
+
+	public Cell this[int i] {
+		get { return m_Cells [i]; }
+
+		set { m_Cells[i] = value; }
+	}
+}
+
 [System.Serializable]
 public class Maze {
 	public int length;

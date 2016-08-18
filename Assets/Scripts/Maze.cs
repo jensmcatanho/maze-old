@@ -1,16 +1,45 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class NewMaze {
-	private Cell[] m_Cells;
+[System.Serializable]
+public class Maze {
+	int m_Length;
+	int m_Width;
 
-	public Cell this[int i] {
-		get { return m_Cells [i]; }
+	Cell[,] m_Cells;
 
-		set { m_Cells[i] = value; }
+	// Maze constructor.
+	public Maze(int length, int width, int cellSize) {
+		InitializeMaze(length, width, cellSize);
 	}
+
+	// Helper function to initialize the matrix.
+	void InitializeMaze(int length, int width, int cellSize) {
+		m_Length = length;
+		m_Width = width;
+
+		m_Cells = new Cell[length, width];
+
+		for (int row = 0; row < length; row++)
+			for (int col = 0; col < width; col++)
+				m_Cells [row, col] = new Cell (cellSize);
+	}
+
+	// Indexer for the cells in the maze.
+	public Cell this[int row, int col] {
+		get { return m_Cells [row, col]; }
+
+		set { m_Cells[row, col] = value; }
+	}
+
+	// Read-only accessors to the maze properties.
+	public int Length { get { return m_Length; } }
+	public int Width { get { return m_Width; } }
+	public int cellSize { get { return m_Cells[0, 0].Size; } }
+
 }
 
+/*
 [System.Serializable]
 public class Maze {
 	public int length;
@@ -126,7 +155,7 @@ public class Maze {
 		 *  dE = percentage of dead ends
 		 *  pC = probability of chest spawning
 		 * 
-		 */
+		 *
 
 		pChest = 0.05f / pDeadEnd;
 	}
@@ -352,3 +381,4 @@ public class Maze {
 		maze [length - 1, width - 1, 2] = 1; 
 	}
 }
+*/

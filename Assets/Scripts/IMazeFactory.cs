@@ -2,5 +2,5 @@
 using System.Collections;
 
 public interface IMazeFactory {
-	void CreateMaze(int length, int width);
+	Maze CreateMaze(int length, int width, int cellSize);
 }

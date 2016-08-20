@@ -1,15 +1,18 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Maze.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\DFSFactory.cs">
     <Files>
-      <File FileName="Assets\Scripts\FinishPoint.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Maze.cs" Line="5" Column="2" />
-      <File FileName="Assets\Scripts\GameManager.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\IMazeFactory.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Maze.cs" Line="133" Column="3" />
+      <File FileName="Assets\Scripts\DFSFactory.cs" Line="89" Column="4" />
+      <File FileName="Assets\Scripts\IMazeFactory.cs" Line="5" Column="55" />
+      <File FileName="Assets\Scripts\Cell.cs" Line="59" Column="30" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <DisabledProjects>
+    <String>Assembly-CSharp-firstpass.csproj</String>
+  </DisabledProjects>
 </Properties>

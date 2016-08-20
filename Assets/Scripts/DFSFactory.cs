@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DFSFactory : IMazeFactory {
+public class DFSFactory : MazeFactory {
 
-	public Maze CreateMaze(int length, int width, int cellSize) {
-		Maze maze = new Maze (length, width, cellSize);
-
+	protected override void CreatePath () {
 		System.Diagnostics.Debug.Assert(!maze[0, 0].HasWall(Wall.None));
+
+		int length = maze.Length;
+		int width = maze.Width;
 
 		ArrayList history = new ArrayList ();
 		ArrayList neighbors = new ArrayList ();
@@ -78,10 +79,29 @@ public class DFSFactory : IMazeFactory {
 
 		// 7. Open an entrance and a exit to the maze.
 		maze [0, 0].SetType (Type.Entrance);
+		maze [0, 0].UnsetWall (Wall.Left);
+
 		maze [length - 1, width - 1].SetType (Type.Exit);
 		maze [length - 1, width - 1].UnsetWall (Wall.Right); 
 
-		return maze;
+	}
+
+	protected override void ChestSetup (float pDeadEnd) {
+		/*  Equation 1: nC = (l * w) * dE * pC
+		 *  Equation 2: nC = (l * w) * 0.05
+		 * 
+		 *  (l * w) * 0.05 = (l * w) * dE * pC =>
+		 *  dE * pC = 0.05
+		 * 
+		 *  l = maze's length
+		 *  w = maze's width
+		 *  nC = maximum number of chests
+		 *  dE = percentage of dead ends
+		 *  pC = probability of chest spawning
+		 * 
+		 */
+
+		pChest = 0.05f / pDeadEnd;
 	}
 
 }

@@ -49,8 +49,9 @@
      <Compile Include="Assets\Scripts\DFSFactory.cs" />
      <Compile Include="Assets\Scripts\FinishPoint.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
-     <Compile Include="Assets\Scripts\IMazeFactory.cs" />
      <Compile Include="Assets\Scripts\Maze.cs" />
+     <Compile Include="Assets\Scripts\MazeFactory.cs" />
+     <Compile Include="Assets\Scripts\MazeObjectFactory.cs" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\Standard Assets\Characters\ThirdPersonCharacter\ThirdPersonCharacterGuidelines.txt" />
      <None Include="Assets\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
